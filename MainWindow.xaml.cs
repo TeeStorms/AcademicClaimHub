@@ -1,5 +1,4 @@
-﻿// MainWindow.xaml.cs
-using System.Windows;
+﻿using System.Windows;
 
 namespace AcademicClaimHub
 {
@@ -8,6 +7,21 @@ namespace AcademicClaimHub
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void GoToLecturer(object sender, RoutedEventArgs e)
+        {
+            MainContent.Content = new Views.LecturerDashboard();
+        }
+
+        private void GoToCoordinator(object sender, RoutedEventArgs e)
+        {
+            MainContent.Content = new Views.ProgrammeCoordinatorDashboard();
+        }
+
+        private void GoToManager(object sender, RoutedEventArgs e)
+        {
+            MainContent.Content = new Views.AcademicManagerDashboard();
         }
     }
 }

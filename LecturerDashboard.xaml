@@ -1,0 +1,13 @@
+﻿<UserControl x:Class="AcademicClaimHub.Views.LecturerDashboard"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Background="{StaticResource PrimaryBackground}">
+        <StackPanel Margin="20">
+            <TextBlock Text="Lecturer Dashboard" 
+                       FontSize="22" FontWeight="Bold"
+                       Foreground="{StaticResource AccentColor}"/>
+            <Button Content="Submit Claim" Margin="0,10,0,0"/>
+            <Button Content="Upload Supporting Document"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
