@@ -1,0 +1,13 @@
+﻿<Window x:Class="AcademicClaimHub.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Academic Claim Hub"
+        Height="450" Width="800">
+    <Grid>
+        <TextBlock Text="Academic Claim Hub"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center"
+                   FontSize="24"
+                   FontWeight="Bold"/>
+    </Grid>
+</Window>
