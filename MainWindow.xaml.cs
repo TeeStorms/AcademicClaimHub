@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿// MainWindow.xaml.cs
+using System.Windows;
 
 namespace AcademicClaimHub
 {
