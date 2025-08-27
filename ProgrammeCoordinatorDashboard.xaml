@@ -3,21 +3,55 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid Background="{StaticResource PrimaryBackground}">
         <StackPanel Margin="20">
+
             <!-- Title -->
-            <TextBlock Text="Programme Coordinator Dashboard" 
-                       FontSize="22" FontWeight="Bold"
+            <TextBlock Text="Programme Coordinator Dashboard"
+                       FontSize="22"
+                       FontWeight="Bold"
                        Foreground="{StaticResource AccentColor}"
                        Margin="0,0,0,10"/>
 
-            <!-- Claims Table -->
-            <DataGrid x:Name="dgClaims" 
+            <!-- Filter ComboBox -->
+            <ComboBox x:Name="cbStatusFilter"
+          Width="160"
+          SelectionChanged="CbStatusFilter_SelectionChanged"
+          Margin="0,0,0,10"
+          Foreground="White"
+          Background="#333333">
+                <ComboBox.ItemContainerStyle>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Foreground" Value="White"/>
+                        <Setter Property="Background" Value="#333333"/>
+                        <Setter Property="Padding" Value="5,2"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                        <Setter Property="VerticalContentAlignment" Value="Center"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#555555"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="{StaticResource AccentColor}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ComboBox.ItemContainerStyle>
+
+                <ComboBoxItem Content="All" IsSelected="True"/>
+                <ComboBoxItem Content="Pending"/>
+                <ComboBoxItem Content="Approved"/>
+                <ComboBoxItem Content="Rejected"/>
+            </ComboBox>
+
+            <!-- Claims DataGrid -->
+            <DataGrid x:Name="dgClaims"
                       AutoGenerateColumns="False"
                       IsReadOnly="True"
                       SelectionMode="Single"
                       GridLinesVisibility="All"
                       HeadersVisibility="Column"
                       Height="200"
-                      Margin="0,10,0,0">
+                      Margin="0,0,0,10">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Claim ID" Binding="{Binding ClaimID}" Width="*"/>
                     <DataGridTextColumn Header="Lecturer" Binding="{Binding LecturerName}" Width="*"/>
@@ -29,15 +63,16 @@
             </DataGrid>
 
             <!-- Action Buttons -->
-            <StackPanel Orientation="Horizontal" Margin="0,15,0,0" HorizontalAlignment="Left">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10" HorizontalAlignment="Left">
                 <Button Content="Approve" Click="ApproveClaim_Click" Width="100" Margin="0,0,10,0"/>
                 <Button Content="Reject" Click="RejectClaim_Click" Width="100"/>
+                <Button Content="Refresh" Click="Refresh_Click" Width="100" Margin="10,0,0,0"/>
             </StackPanel>
 
             <!-- Status Label -->
-            <TextBlock x:Name="lblStatus" 
-                       Foreground="{StaticResource AccentColor}" 
-                       Margin="0,15,0,0"/>
+            <TextBlock x:Name="lblStatus"
+                       Foreground="{StaticResource AccentColor}"
+                       Margin="0,10,0,0"/>
         </StackPanel>
     </Grid>
 </UserControl>
