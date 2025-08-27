@@ -1,4 +1,7 @@
-﻿using System.Windows.Controls;
+﻿using System.Linq;
+using System.Windows.Controls;
+using AcademicClaimHub.Data;
+using System.Collections.Generic;
 
 namespace AcademicClaimHub.Views
 {
@@ -9,14 +12,22 @@ namespace AcademicClaimHub.Views
             InitializeComponent();
         }
 
-        public void GenerateReports()
+        private void ViewStats_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            // Placeholder for reports logic
-        }
+            int totalClaims = ClaimRepository.Claims.Count;
+            double totalAmount = ClaimRepository.Claims.Sum(c => c.TotalAmount);
+            int approved = ClaimRepository.Claims.Count(c => c.Status == "Approved");
+            int rejected = ClaimRepository.Claims.Count(c => c.Status == "Rejected");
 
-        public void ViewStatistics()
-        {
-            // Placeholder for statistics logic
+            var stats = new List<KeyValuePair<string, string>>()
+            {
+                new KeyValuePair<string, string>("Total Claims", totalClaims.ToString()),
+                new KeyValuePair<string, string>("Total Amount", totalAmount.ToString("C")),
+                new KeyValuePair<string, string>("Approved", approved.ToString()),
+                new KeyValuePair<string, string>("Rejected", rejected.ToString())
+            };
+
+            StatsGrid.ItemsSource = stats;
         }
     }
 }

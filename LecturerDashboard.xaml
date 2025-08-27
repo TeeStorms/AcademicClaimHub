@@ -3,11 +3,38 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid Background="{StaticResource PrimaryBackground}">
         <StackPanel Margin="20">
+            <!-- Page Title -->
             <TextBlock Text="Lecturer Dashboard" 
                        FontSize="22" FontWeight="Bold"
                        Foreground="{StaticResource AccentColor}"/>
-            <Button Content="Submit Claim" Margin="0,10,0,0"/>
-            <Button Content="Upload Supporting Document"/>
+
+            <!-- Lecturer Name -->
+            <TextBlock Text="Lecturer Name:" 
+                       Margin="0,10,0,0"
+                       Foreground="White"/>
+            <TextBox x:Name="txtLecturerName" Margin="0,2,0,0"/>
+
+            <!-- Hours Worked -->
+            <TextBlock Text="Hours Worked:" 
+                       Margin="0,10,0,0"
+                       Foreground="White"/>
+            <TextBox x:Name="txtHours" Margin="0,2,0,0"/>
+
+            <!-- Hourly Rate -->
+            <TextBlock Text="Hourly Rate:" 
+                       Margin="0,10,0,0"
+                       Foreground="White"/>
+            <TextBox x:Name="txtRate" Margin="0,2,0,0"/>
+
+            <!-- Submit Button -->
+            <Button Content="Submit Claim" 
+                    Click="SubmitClaim_Click" 
+                    Margin="0,15,0,0"/>
+
+            <!-- Status Label -->
+            <TextBlock x:Name="lblStatus" 
+                       Foreground="{StaticResource AccentColor}" 
+                       Margin="0,10,0,0"/>
         </StackPanel>
     </Grid>
 </UserControl>

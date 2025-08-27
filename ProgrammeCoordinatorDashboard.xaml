@@ -3,11 +3,41 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid Background="{StaticResource PrimaryBackground}">
         <StackPanel Margin="20">
+            <!-- Title -->
             <TextBlock Text="Programme Coordinator Dashboard" 
                        FontSize="22" FontWeight="Bold"
-                       Foreground="{StaticResource AccentColor}"/>
-            <Button Content="Review Claims" Margin="0,10,0,0"/>
-            <Button Content="Approve/Reject Claims"/>
+                       Foreground="{StaticResource AccentColor}"
+                       Margin="0,0,0,10"/>
+
+            <!-- Claims Table -->
+            <DataGrid x:Name="dgClaims" 
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      SelectionMode="Single"
+                      GridLinesVisibility="All"
+                      HeadersVisibility="Column"
+                      Height="200"
+                      Margin="0,10,0,0">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Claim ID" Binding="{Binding ClaimID}" Width="*"/>
+                    <DataGridTextColumn Header="Lecturer" Binding="{Binding LecturerName}" Width="*"/>
+                    <DataGridTextColumn Header="Hours" Binding="{Binding HoursWorked}" Width="*"/>
+                    <DataGridTextColumn Header="Rate" Binding="{Binding HourlyRate}" Width="*"/>
+                    <DataGridTextColumn Header="Total" Binding="{Binding TotalAmount}" Width="*"/>
+                    <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <!-- Action Buttons -->
+            <StackPanel Orientation="Horizontal" Margin="0,15,0,0" HorizontalAlignment="Left">
+                <Button Content="Approve" Click="ApproveClaim_Click" Width="100" Margin="0,0,10,0"/>
+                <Button Content="Reject" Click="RejectClaim_Click" Width="100"/>
+            </StackPanel>
+
+            <!-- Status Label -->
+            <TextBlock x:Name="lblStatus" 
+                       Foreground="{StaticResource AccentColor}" 
+                       Margin="0,15,0,0"/>
         </StackPanel>
     </Grid>
 </UserControl>

@@ -3,11 +3,65 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid Background="{StaticResource PrimaryBackground}">
         <StackPanel Margin="20">
+
+            <!-- Title -->
             <TextBlock Text="Academic Manager Dashboard" 
-                       FontSize="22" FontWeight="Bold"
-                       Foreground="{StaticResource AccentColor}"/>
-            <Button Content="Generate Reports" Margin="0,10,0,0"/>
-            <Button Content="View Statistics"/>
+                       FontSize="24" FontWeight="Bold"
+                       Foreground="{StaticResource AccentColor}" 
+                       Margin="0,0,0,20"/>
+
+            <!-- Button to Load Stats -->
+            <Button Content="Load Statistics" 
+                    Click="ViewStats_Click" 
+                    Width="150"
+                    Margin="0,0,0,15"/>
+
+            <!-- Manager Stats in a DataGrid -->
+            <DataGrid x:Name="StatsGrid"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      IsReadOnly="True"
+                      GridLinesVisibility="None"
+                      HeadersVisibility="Column"
+                      Margin="0,0,0,20"
+                      RowHeight="35"
+                      Background="#1E1E1E" 
+                      Foreground="White"
+                      BorderBrush="{StaticResource AccentColor}"
+                      BorderThickness="1"
+                      ColumnHeaderHeight="35"
+                      FontSize="14">
+
+                <DataGrid.Resources>
+                    <!-- Dark Themed Headers -->
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="#2D2D30"/>
+                        <Setter Property="Foreground" Value="White"/>
+                        <Setter Property="FontWeight" Value="Bold"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        <Setter Property="Padding" Value="8"/>
+                    </Style>
+
+                    <!-- Row Hover Effect -->
+                    <Style TargetType="DataGridRow">
+                        <Setter Property="Background" Value="#252526"/>
+                        <Setter Property="Foreground" Value="White"/>
+                        <Setter Property="FontSize" Value="14"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#3E3E42"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.Resources>
+
+                <!-- Define Columns -->
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Statistic" Binding="{Binding Key}" Width="2*"/>
+                    <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
         </StackPanel>
     </Grid>
 </UserControl>

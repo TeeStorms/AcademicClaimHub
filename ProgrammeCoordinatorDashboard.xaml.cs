@@ -1,4 +1,7 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
+using AcademicClaimHub.Data;
+using AcademicClaimHub.Models;
 
 namespace AcademicClaimHub.Views
 {
@@ -7,16 +10,41 @@ namespace AcademicClaimHub.Views
         public ProgrammeCoordinatorDashboard()
         {
             InitializeComponent();
+            LoadClaims();
         }
 
-        public void ReviewClaims()
+        private void LoadClaims()
         {
-            // Placeholder for reviewing claims
+            dgClaims.ItemsSource = null;
+            dgClaims.ItemsSource = ClaimRepository.Claims;
         }
 
-        public void ApproveClaim()
+        private void ApproveClaim_Click(object sender, RoutedEventArgs e)
         {
-            // Placeholder for approval logic
+            if (dgClaims.SelectedItem is Claim claim)
+            {
+                claim.Status = "Approved";
+                lblStatus.Text = $"✅ Claim {claim.ClaimID} approved.";
+                LoadClaims();
+            }
+            else
+            {
+                lblStatus.Text = "⚠ Please select a claim to approve.";
+            }
+        }
+
+        private void RejectClaim_Click(object sender, RoutedEventArgs e)
+        {
+            if (dgClaims.SelectedItem is Claim claim)
+            {
+                claim.Status = "Rejected";
+                lblStatus.Text = $"❌ Claim {claim.ClaimID} rejected.";
+                LoadClaims();
+            }
+            else
+            {
+                lblStatus.Text = "⚠ Please select a claim to reject.";
+            }
         }
     }
 }
