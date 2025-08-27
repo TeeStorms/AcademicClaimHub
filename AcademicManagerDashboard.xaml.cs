@@ -14,20 +14,51 @@ namespace AcademicClaimHub.Views
 
         private void ViewStats_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            int totalClaims = ClaimRepository.Claims.Count;
-            double totalAmount = ClaimRepository.Claims.Sum(c => c.TotalAmount);
-            int approved = ClaimRepository.Claims.Count(c => c.Status == "Approved");
-            int rejected = ClaimRepository.Claims.Count(c => c.Status == "Rejected");
+            var claims = ClaimRepository.Claims;
 
-            var stats = new List<KeyValuePair<string, string>>()
+            int totalClaims = claims.Count;
+            double totalAmount = claims.Sum(c => c.TotalAmount);
+            int approved = claims.Count(c => c.Status == "Approved");
+            int rejected = claims.Count(c => c.Status == "Rejected");
+            int pending = claims.Count(c => c.Status == "Pending");
+
+            // Summary
+            var stats = new List<KeyValuePair<string, string>>
             {
-                new KeyValuePair<string, string>("Total Claims", totalClaims.ToString()),
-                new KeyValuePair<string, string>("Total Amount", totalAmount.ToString("C")),
-                new KeyValuePair<string, string>("Approved", approved.ToString()),
-                new KeyValuePair<string, string>("Rejected", rejected.ToString())
+                new("Total Claims", totalClaims.ToString()),
+                new("Total Amount", totalAmount.ToString("C")),
+                new("Approved", approved.ToString()),
+                new("Rejected", rejected.ToString()),
+                new("Pending", pending.ToString())
             };
-
             StatsGrid.ItemsSource = stats;
+
+            // Status breakdown
+            var statusBreakdown = claims
+                .GroupBy(c => c.Status)
+                .Select(g => new
+                {
+                    Status = g.Key,
+                    Count = g.Count(),
+                    TotalAmount = g.Sum(x => x.TotalAmount).ToString("C")
+                })
+                .OrderByDescending(x => x.Count)
+                .ToList();
+            StatusBreakdownGrid.ItemsSource = statusBreakdown;
+
+            // Per-lecturer
+            var perLecturer = claims
+                .GroupBy(c => c.LecturerName)
+                .Select(g => new
+                {
+                    LecturerName = g.Key,
+                    Count = g.Count(),
+                    TotalHours = g.Sum(x => x.HoursWorked),
+                    TotalAmount = g.Sum(x => x.TotalAmount).ToString("C")
+                })
+                .OrderByDescending(x => x.TotalAmount) // sorts as string; acceptable for demo
+                .ToList();
+            PerLecturerGrid.ItemsSource = perLecturer;
         }
     }
 }
