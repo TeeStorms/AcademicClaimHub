@@ -7,22 +7,25 @@ namespace AcademicClaimHub
         public MainWindow()
         {
             InitializeComponent();
-            // Default page
+            // Set the default page to Lecturer Dashboard when the app starts
             GoToLecturer(this, new RoutedEventArgs());
         }
 
+        // Navigate to the Lecturer Dashboard
         private void GoToLecturer(object sender, RoutedEventArgs e)
         {
             MainContent.Content = new Views.LecturerDashboard();
             txtCurrentPage.Text = "Lecturer Dashboard";
         }
 
+        // Navigate to the Programme Coordinator Dashboard
         private void GoToCoordinator(object sender, RoutedEventArgs e)
         {
             MainContent.Content = new Views.ProgrammeCoordinatorDashboard();
             txtCurrentPage.Text = "Programme Coordinator Dashboard";
         }
 
+        // Navigate to the Academic Manager Dashboard
         private void GoToManager(object sender, RoutedEventArgs e)
         {
             MainContent.Content = new Views.AcademicManagerDashboard();

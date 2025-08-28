@@ -7,38 +7,43 @@ using AcademicClaimHub.Models;
 
 namespace AcademicClaimHub.Views
 {
+    // Dashboard view for Programme Coordinators
     public partial class ProgrammeCoordinatorDashboard : UserControl
     {
         public ProgrammeCoordinatorDashboard()
         {
             InitializeComponent();
 
-            // Set default filter if null
+            // Set a default filter when the dashboard loads
             if (cbStatusFilter != null)
                 cbStatusFilter.SelectedIndex = 0;
 
-            // Load claims after UI fully loaded
+            // Load claims once the page is fully loaded
             Loaded += (s, e) => LoadClaims();
         }
 
+        // Get the current filter option from the dropdown
         private string GetSelectedFilter()
         {
             if (cbStatusFilter == null)
-                return "All"; // Safe fallback
+                return "All"; // Default filter if dropdown is not set
 
             var item = cbStatusFilter.SelectedItem as ComboBoxItem;
             return item?.Content?.ToString() ?? "All";
         }
 
+        // Load and display claims in the table based on the filter
         private void LoadClaims()
         {
-            // Safely handle null Claims collection
+            // Use empty list if Claims data is missing
             IEnumerable<Claim> data = ClaimRepository.Claims ?? Enumerable.Empty<Claim>();
             var filter = GetSelectedFilter();
 
+            // Apply filter if not set to "All"
             if (filter != "All")
                 data = data.Where(c => c.Status == filter);
 
+            // Refresh the data grid with claims
             if (dgClaims != null)
             {
                 dgClaims.ItemsSource = null;
@@ -46,13 +51,14 @@ namespace AcademicClaimHub.Views
             }
         }
 
+        // Approve the selected claim
         private void ApproveClaim_Click(object sender, RoutedEventArgs e)
         {
             if (dgClaims.SelectedItem is Claim claim)
             {
                 claim.Status = "Approved";
                 lblStatus.Text = $"✅ Claim {claim.ClaimID} approved.";
-                LoadClaims();
+                LoadClaims(); // Refresh list
             }
             else
             {
@@ -60,13 +66,14 @@ namespace AcademicClaimHub.Views
             }
         }
 
+        // Reject the selected claim
         private void RejectClaim_Click(object sender, RoutedEventArgs e)
         {
             if (dgClaims.SelectedItem is Claim claim)
             {
                 claim.Status = "Rejected";
                 lblStatus.Text = $"❌ Claim {claim.ClaimID} rejected.";
-                LoadClaims();
+                LoadClaims(); // Refresh list
             }
             else
             {
@@ -74,11 +81,13 @@ namespace AcademicClaimHub.Views
             }
         }
 
+        // Refresh claim list when filter changes
         private void CbStatusFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             LoadClaims();
         }
 
+        // Refresh claim list when refresh button is clicked
         private void Refresh_Click(object sender, RoutedEventArgs e)
         {
             LoadClaims();

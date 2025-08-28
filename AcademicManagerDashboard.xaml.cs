@@ -9,20 +9,21 @@ namespace AcademicClaimHub.Views
     {
         public AcademicManagerDashboard()
         {
-            InitializeComponent();
+            InitializeComponent(); // Initialize UI components
         }
 
         private void ViewStats_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            var claims = ClaimRepository.Claims;
+            var claims = ClaimRepository.Claims; // Get all in-memory claims
 
+            // Calculate summary statistics
             int totalClaims = claims.Count;
             double totalAmount = claims.Sum(c => c.TotalAmount);
             int approved = claims.Count(c => c.Status == "Approved");
             int rejected = claims.Count(c => c.Status == "Rejected");
             int pending = claims.Count(c => c.Status == "Pending");
 
-            // Summary
+            // Populate overall summary grid
             var stats = new List<KeyValuePair<string, string>>
             {
                 new("Total Claims", totalClaims.ToString()),
@@ -33,7 +34,7 @@ namespace AcademicClaimHub.Views
             };
             StatsGrid.ItemsSource = stats;
 
-            // Status breakdown
+            // Populate status breakdown grid
             var statusBreakdown = claims
                 .GroupBy(c => c.Status)
                 .Select(g => new
@@ -46,7 +47,7 @@ namespace AcademicClaimHub.Views
                 .ToList();
             StatusBreakdownGrid.ItemsSource = statusBreakdown;
 
-            // Per-lecturer
+            // Populate per-lecturer summary grid
             var perLecturer = claims
                 .GroupBy(c => c.LecturerName)
                 .Select(g => new
@@ -56,7 +57,7 @@ namespace AcademicClaimHub.Views
                     TotalHours = g.Sum(x => x.HoursWorked),
                     TotalAmount = g.Sum(x => x.TotalAmount).ToString("C")
                 })
-                .OrderByDescending(x => x.TotalAmount) // sorts as string; acceptable for demo
+                .OrderByDescending(x => x.TotalAmount) // Sorts by total amount (string)
                 .ToList();
             PerLecturerGrid.ItemsSource = perLecturer;
         }

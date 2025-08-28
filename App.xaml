@@ -4,7 +4,9 @@
              StartupUri="Views\MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
-            <!-- Palette -->
+
+            <!-- ================= Palette ================= -->
+            <!-- Core colors for dark theme -->
             <SolidColorBrush x:Key="PrimaryBackground" Color="#1E1E2E"/>
             <SolidColorBrush x:Key="SecondaryBackground" Color="#2A2A3D"/>
             <SolidColorBrush x:Key="PrimaryText" Color="#E0E0E0"/>
@@ -13,19 +15,22 @@
             <SolidColorBrush x:Key="DangerColor" Color="#FF5C5C"/>
             <SolidColorBrush x:Key="SuccessColor" Color="#7ED957"/>
 
-            <!-- Window -->
+            <!-- ================= Window Style ================= -->
+            <!-- Default appearance for all windows -->
             <Style TargetType="Window">
                 <Setter Property="Background" Value="{StaticResource PrimaryBackground}"/>
                 <Setter Property="Foreground" Value="{StaticResource PrimaryText}"/>
                 <Setter Property="FontFamily" Value="Segoe UI"/>
             </Style>
 
-            <!-- TextBlock -->
+            <!-- ================= TextBlock Style ================= -->
+            <!-- Default text color for all TextBlocks -->
             <Style TargetType="TextBlock">
                 <Setter Property="Foreground" Value="{StaticResource PrimaryText}"/>
             </Style>
 
-            <!-- Button -->
+            <!-- ================= Button Style ================= -->
+            <!-- Standard button look: accent color, bold text, hand cursor -->
             <Style TargetType="Button">
                 <Setter Property="Background" Value="{StaticResource AccentColor}"/>
                 <Setter Property="Foreground" Value="Black"/>
@@ -36,7 +41,8 @@
                 <Setter Property="Cursor" Value="Hand"/>
             </Style>
 
-            <!-- TextBox (dark) -->
+            <!-- ================= TextBox Style ================= -->
+            <!-- Dark-themed input boxes with padding and border -->
             <Style TargetType="TextBox">
                 <Setter Property="Background" Value="#262738"/>
                 <Setter Property="Foreground" Value="{StaticResource PrimaryText}"/>
@@ -45,7 +51,8 @@
                 <Setter Property="Padding" Value="6"/>
             </Style>
 
-            <!-- DataGrid (dark) -->
+            <!-- ================= DataGrid Style ================= -->
+            <!-- Dark-themed tables with fixed row height, read-only by default -->
             <Style TargetType="DataGrid">
                 <Setter Property="Background" Value="#1E1E2E"/>
                 <Setter Property="Foreground" Value="{StaticResource PrimaryText}"/>
@@ -62,6 +69,7 @@
                 <Setter Property="AutoGenerateColumns" Value="False"/>
             </Style>
 
+            <!-- Column header appearance -->
             <Style TargetType="DataGridColumnHeader">
                 <Setter Property="Background" Value="#2A2A3D"/>
                 <Setter Property="Foreground" Value="{StaticResource PrimaryText}"/>
@@ -70,6 +78,7 @@
                 <Setter Property="Padding" Value="8,6"/>
             </Style>
 
+            <!-- Row appearance with hover and selection highlights -->
             <Style TargetType="DataGridRow">
                 <Setter Property="Background" Value="#252738"/>
                 <Setter Property="Foreground" Value="{StaticResource PrimaryText}"/>
@@ -83,6 +92,7 @@
                     </Trigger>
                 </Style.Triggers>
             </Style>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>
