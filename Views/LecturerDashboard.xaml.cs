@@ -86,7 +86,7 @@ namespace AcademicClaimHub.Views
         private void ShowError(string message)
         {
             lblStatus.Foreground = (System.Windows.Media.Brush)Application.Current.FindResource("DangerColor");
-            lblStatus.Text = "Error: " + message;
+            lblStatus.Text = $"Error: {message}";
         }
 
         /// <summary>
