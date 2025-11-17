@@ -1,0 +1,62 @@
+﻿@page
+@model ClaimManagementHub.Pages.Dashboard.IndexModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
+        <p class="text-gray-600">Overview of all claim activities</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+            <p class="text-sm font-medium text-gray-600">Total Claims</p>
+            <p class="text-3xl font-bold text-gray-900">@Model.Summary.TotalClaims</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+            <p class="text-sm font-medium text-gray-600">Pending Review</p>
+            <p class="text-3xl font-bold text-yellow-600">@Model.Summary.PendingClaims</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+            <p class="text-sm font-medium text-gray-600">Approved</p>
+            <p class="text-3xl font-bold text-green-600">@Model.Summary.ApprovedClaims</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+            <p class="text-sm font-medium text-gray-600">Total Approved</p>
+            <p class="text-2xl font-bold text-green-700">R@Model.Summary.TotalAmountApproved.ToString("F2")</p>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Recent Claims</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lecturer</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Submitted</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    @foreach (var c in Model.Recent)
+                    {
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4">#@c.Id</td>
+                            <td class="px-6 py-4">@c.LecturerName</td>
+                            <td class="px-6 py-4">R@c.TotalAmount.ToString("F2")</td>
+                            <td class="px-6 py-4">@c.Status</td>
+                            <td class="px-6 py-4">@c.SubmittedAt.ToLocalTime().ToString("g")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

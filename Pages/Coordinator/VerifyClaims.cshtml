@@ -1,0 +1,79 @@
+﻿@page
+@model ClaimManagementHub.Pages.Coordinator.VerifyClaimsModel
+@{
+    ViewData["Title"] = "Verify Claims";
+}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="text-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Verify Claims</h1>
+        <p class="text-gray-600">Review and approve submitted lecturer claims</p>
+    </div>
+
+    <div class="mb-4 flex gap-2 justify-center">
+        <form method="get">
+            <select name="filter" onchange="this.form.submit()" class="px-3 py-2 border rounded">
+                <option value="all" selected="@Model.Filter=='all'">All</option>
+                <option value="pending" selected="@Model.Filter=='pending'">Pending (@Model.StatusCounts.Pending)</option>
+                <option value="approved" selected="@Model.Filter=='approved'">Approved (@Model.StatusCounts.Approved)</option>
+                <option value="rejected" selected="@Model.Filter=='rejected'">Rejected (@Model.StatusCounts.Rejected)</option>
+            </select>
+        </form>
+    </div>
+
+    <div class="bg-white shadow-xl rounded-lg overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Claim ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lecturer</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hours</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rate</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Submitted</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @foreach (var claim in Model.Claims)
+                    {
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 text-sm font-medium">#@claim.Id</td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm font-medium text-gray-900">@claim.LecturerName</div>
+                                @if (!string.IsNullOrEmpty(claim.AdditionalNotes))
+                                {
+                                    <div class="text-sm text-gray-500 truncate max-w-xs">@claim.AdditionalNotes</div>
+                                }
+                            </td>
+                            <td class="px-6 py-4">@claim.HoursWorked</td>
+                            <td class="px-6 py-4">R@claim.HourlyRate.ToString("F2")</td>
+                            <td class="px-6 py-4 font-medium">R@claim.TotalAmount.ToString("F2")</td>
+                            <td class="px-6 py-4">
+                                <span class="px-2 py-1 text-xs font-medium rounded-full @(claim.Status == "pending" ? "bg-yellow-100 text-yellow-800" : claim.Status == "approved" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800")">
+                                    @claim.Status.ToUpperInvariant()
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-500">@claim.SubmittedAt.ToLocalTime().ToString("g")</td>
+                            <td class="px-6 py-4 text-sm font-medium">
+                                @if (claim.Status == "pending")
+                                {
+                                    <form method="post" class="flex gap-2">
+                                        <button asp-page-handler="Approve" asp-route-id="@claim.Id" class="bg-green-600 text-white px-3 py-1 rounded">Approve</button>
+                                        <button asp-page-handler="Reject" asp-route-id="@claim.Id" class="bg-red-600 text-white px-3 py-1 rounded">Reject</button>
+                                    </form>
+                                }
+                                else if (claim.ReviewedAt.HasValue)
+                                {
+                                    <div class="text-xs text-gray-500">@claim.Status.ToUpperInvariant() on @claim.ReviewedAt.Value.ToLocalTime().ToString("g")</div>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
