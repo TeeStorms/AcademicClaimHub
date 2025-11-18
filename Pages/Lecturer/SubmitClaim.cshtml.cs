@@ -1,11 +1,13 @@
 ﻿using ClaimManagementHub.Models;
 using ClaimManagementHub.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 
 namespace ClaimManagementHub.Pages.Lecturer
 {
+    [Authorize(Policy = "LecturerOnly")]
     public class SubmitClaimModel : PageModel
     {
         private readonly IClaimsRepository _repo;

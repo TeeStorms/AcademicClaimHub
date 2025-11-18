@@ -1,5 +1,6 @@
 ﻿using ClaimManagementHub.Models;
 using ClaimManagementHub.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace ClaimManagementHub.Pages.Coordinator
 {
+    [Authorize(Policy = "CoordinatorOnly")]
     public class VerifyClaimsModel : PageModel
     {
         private readonly IClaimsRepository _repo;
