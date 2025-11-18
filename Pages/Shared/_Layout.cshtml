@@ -21,10 +21,33 @@
                 </a>
 
                 <div class="flex items-center space-x-6">
-                    <a asp-page="/Index" class="text-gray-600 hover:text-blue-700 hover:bg-blue-50 px-3 py-2 rounded-md">Home</a>
-                    <a asp-page="/Lecturer/SubmitClaim" class="text-gray-600 hover:text-blue-700 hover:bg-blue-50 px-3 py-2 rounded-md">Submit Claim</a>
-                    <a asp-page="/Coordinator/VerifyClaims" class="text-gray-600 hover:text-blue-700 hover:bg-blue-50 px-3 py-2 rounded-md">Verify Claims</a>
-                    <a asp-page="/Dashboard/Index" class="text-gray-600 hover:text-blue-700 hover:bg-blue-50 px-3 py-2 rounded-md">Dashboard</a>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <span class="text-gray-600">Welcome, @User.Identity.Name</span>
+
+                        <!-- Role-based navigation -->
+                        @if (User.HasClaim("Role", "Lecturer"))
+                        {
+                            <a asp-page="/Lecturer/SubmitClaim" class="text-gray-600 hover:text-blue-700 hover:bg-blue-50 px-3 py-2 rounded-md">Submit Claim</a>
+                        }
+                        @if (User.HasClaim("Role", "Coordinator") || User.HasClaim("Role", "Manager"))
+                        {
+                            <a asp-page="/Coordinator/VerifyClaims" class="text-gray-600 hover:text-blue-700 hover:bg-blue-50 px-3 py-2 rounded-md">Verify Claims</a>
+                        }
+                        @if (User.HasClaim("Role", "HR"))
+                        {
+                            <a asp-page="/HR/Dashboard" class="text-gray-600 hover:text-blue-700 hover:bg-blue-50 px-3 py-2 rounded-md">HR Dashboard</a>
+                        }
+
+                        <a asp-page="/Dashboard/Index" class="text-gray-600 hover:text-blue-700 hover:bg-blue-50 px-3 py-2 rounded-md">Dashboard</a>
+                        <form method="post" asp-page="/Account/Logout" class="inline">
+                            <button type="submit" class="text-gray-600 hover:text-blue-700 hover:bg-blue-50 px-3 py-2 rounded-md">Logout</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <a asp-page="/Account/Login" class="text-gray-600 hover:text-blue-700 hover:bg-blue-50 px-3 py-2 rounded-md">Login</a>
+                    }
                 </div>
             </div>
         </div>
