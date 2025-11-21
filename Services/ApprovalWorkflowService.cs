@@ -8,9 +8,9 @@ namespace ClaimManagementHub.Services
 
         public ApprovalWorkflowService()
         {
-            _rules = new List<ApprovalRule>
+            _rules = new()
             {
-                new ApprovalRule
+                new()
                 {
                     Name = "Small Claim Auto-Approval",
                     Condition = claim => claim.TotalAmount <= 1000 && claim.HoursWorked <= 10,
@@ -19,7 +19,7 @@ namespace ClaimManagementHub.Services
                         claim.AdditionalNotes += " [AUTO-APPROVED: Small claim]";
                     }
                 },
-                new ApprovalRule
+                new()
                 {
                     Name = "High Amount Flag",
                     Condition = claim => claim.TotalAmount > 5000,
@@ -27,7 +27,7 @@ namespace ClaimManagementHub.Services
                         claim.AdditionalNotes += " [FLAGGED: High amount requires manager review]";
                     }
                 },
-                new ApprovalRule
+                new()
                 {
                     Name = "Overtime Check",
                     Condition = claim => claim.HoursWorked > 40,
@@ -35,7 +35,7 @@ namespace ClaimManagementHub.Services
                         claim.AdditionalNotes += " [FLAGGED: Overtime hours require justification]";
                     }
                 },
-                new ApprovalRule
+                new()
                 {
                     Name = "Unusual Rate Check",
                     Condition = claim => claim.HourlyRate > 200 || claim.HourlyRate < 30,
