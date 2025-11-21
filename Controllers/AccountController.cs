@@ -47,7 +47,7 @@ namespace ClaimManagementHub.Controllers
                     return View();
                 }
 
-                // Use fully qualified Claim type from System.Security.Claims
+                // Use fully qualified Claim type to avoid ambiguity
                 var claims = new List<System.Security.Claims.Claim>
                 {
                     new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.NameIdentifier, user.Id),
@@ -108,6 +108,14 @@ namespace ClaimManagementHub.Controllers
             }
 
             return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        public IActionResult AccessDenied()
+        {
+            _logger.LogWarning("Access denied for user {User} at {Path}", User.Identity?.Name, HttpContext.Request.Path);
+            TempData["ErrorMessage"] = "You do not have permission to access this resource.";
+            return View();
         }
 
         private static string GetRedirectUrl(string role)

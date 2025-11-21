@@ -1,4 +1,5 @@
-﻿using ClaimManagementHub.Services;
+﻿using ClaimManagementHub.Hubs;
+using ClaimManagementHub.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http.Features;
 
@@ -11,11 +12,21 @@ builder.Services.AddControllersWithViews()
         options.PageViewLocationFormats.Add("/Views/Shared/{0}.cshtml");
     });
 
+// Add SignalR for real-time features
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = builder.Environment.IsDevelopment();
+    options.MaximumReceiveMessageSize = 1024 * 1024; // 1MB
+});
+
 // Add services to the container with modern configuration
 builder.Services.AddSingleton<IClaimsRepository, InMemoryClaimsRepository>();
 builder.Services.AddSingleton<InMemoryUserService>();
 builder.Services.AddSingleton<ClaimValidator>();
 builder.Services.AddSingleton<ApprovalWorkflowService>();
+
+// Add the new FileUploadService
+builder.Services.AddScoped<FileUploadService>();
 
 // Add HTTP context accessor for modern user management
 builder.Services.AddHttpContextAccessor();
@@ -79,6 +90,11 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts(); // HTTP Strict Transport Security
 }
+else
+{
+    // Detailed errors in development
+    app.UseDeveloperExceptionPage();
+}
 
 // Enable response compression
 app.UseResponseCompression();
@@ -101,6 +117,15 @@ app.Use(async (context, next) =>
     context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
     context.Response.Headers.Append("X-Frame-Options", "DENY");
     context.Response.Headers.Append("X-XSS-Protection", "1; mode=block");
+
+    // Add CSP for better security
+    context.Response.Headers.Append("Content-Security-Policy",
+        "default-src 'self'; " +
+        "script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; " +
+        "style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com https://cdnjs.cloudflare.com; " +
+        "font-src 'self' https://fonts.gstatic.com; " +
+        "connect-src 'self' wss://*;"); // Allow WebSocket connections for SignalR
+
     await next();
 });
 
@@ -116,5 +141,11 @@ app.MapControllerRoute(
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
+// SignalR hub mapping for real-time features
+app.MapHub<ClaimHub>("/claimHub"); // Changed from ClaimManagementHub to ClaimHub
+
+// Health check endpoint
+app.MapGet("/health", () => Results.Ok(new { status = "Healthy", timestamp = DateTime.UtcNow }));
 
 app.Run();
