@@ -1,0 +1,495 @@
+﻿@model IEnumerable<ClaimManagementHub.Models.Claim>
+@{
+    ViewData["Title"] = "Verify Claims - ClaimFlow Pro";
+}
+
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-8">
+    <div class="max-w-7xl mx-auto px-6">
+        <!-- Header -->
+        <div class="mb-8 slide-up">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                    <h1 class="text-4xl font-bold text-gray-900 bg-gradient-to-r from-gray-900 to-blue-900 bg-clip-text text-transparent">
+                        Claim Verification
+                    </h1>
+                    <p class="text-gray-600 mt-3 text-lg">Review and process lecturer claims</p>
+                </div>
+                <div class="mt-4 lg:mt-0 flex space-x-3">
+                    <button id="bulkApproveBtn" class="bg-gradient-to-br from-green-500 to-green-600 text-white px-6 py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 opacity-50 cursor-not-allowed" disabled>
+                        <i class="fas fa-check-double mr-2"></i>
+                        Bulk Approve
+                    </button>
+                    <button id="refreshBtn" class="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-2xl font-semibold hover:border-primary-400 hover:text-primary-600 transition-all duration-300">
+                        <i class="fas fa-sync-alt mr-2"></i>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-2xl p-6 shadow-xl border border-gray-200/50 hover-lift slide-up">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Pending Review</p>
+                        <p class="text-2xl font-bold text-gray-900">@ViewBag.StatusCounts.Pending</p>
+                    </div>
+                    <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg">
+                        <i class="fas fa-clock text-white text-lg"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-xl border border-gray-200/50 hover-lift slide-up" style="animation-delay: 0.1s">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Approved</p>
+                        <p class="text-2xl font-bold text-gray-900">@ViewBag.StatusCounts.Approved</p>
+                    </div>
+                    <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
+                        <i class="fas fa-check-circle text-white text-lg"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-xl border border-gray-200/50 hover-lift slide-up" style="animation-delay: 0.2s">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Auto-Approved</p>
+                        <p class="text-2xl font-bold text-gray-900">@ViewBag.StatusCounts.AutoApproved</p>
+                    </div>
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
+                        <i class="fas fa-robot text-white text-lg"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-xl border border-gray-200/50 hover-lift slide-up" style="animation-delay: 0.3s">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Flagged</p>
+                        <p class="text-2xl font-bold text-gray-900">@ViewBag.StatusCounts.Flagged</p>
+                    </div>
+                    <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center shadow-lg">
+                        <i class="fas fa-flag text-white text-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Filters Sidebar -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-2xl shadow-xl border border-gray-200/50 p-6 sticky top-24 slide-up">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Filters & Sort</h3>
+
+                    <!-- Status Filter -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Status Filter</label>
+                        <select id="statusFilter" class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300">
+                            @foreach (var item in ViewBag.FilterOptions)
+                            {
+                                <option value="@item.Value" selected="@(item.Value == ViewBag.Filter)">@item.Text</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Sort Options -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+                        <select id="sortBy" class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300">
+                            @foreach (var item in ViewBag.SortOptions)
+                            {
+                                <option value="@item.Value" selected="@(item.Value == ViewBag.SortBy)">@item.Text</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-700 mb-3">Quick Actions</h4>
+                        <div class="space-y-2">
+                            <button id="selectAllBtn" class="w-full text-left px-4 py-3 text-sm text-gray-600 hover:bg-gray-50 rounded-xl transition-all duration-300 group">
+                                <i class="fas fa-check-square mr-2"></i>Select All Visible
+                            </button>
+                            <button id="clearSelectionBtn" class="w-full text-left px-4 py-3 text-sm text-gray-600 hover:bg-gray-50 rounded-xl transition-all duration-300 group">
+                                <i class="fas fa-times-circle mr-2"></i>Clear Selection
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Claims List -->
+            <div class="lg:col-span-3">
+                <div class="bg-white rounded-2xl shadow-xl border border-gray-200/50 overflow-hidden slide-up" style="animation-delay: 0.1s">
+                    <!-- Table Header -->
+                    <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-xl font-bold text-gray-900">Claims</h3>
+                            <span class="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">@Model.Count() claims found</span>
+                        </div>
+                    </div>
+
+                    <!-- Claims Table -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-8">
+                                        <input type="checkbox" id="selectAll" class="rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                                    </th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Lecturer</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Details</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Amount</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Submitted</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                @foreach (var claim in Model)
+                                {
+                                    <tr class="hover:bg-gray-50/50 transition-colors duration-200 group" data-claim-id="@claim.Id">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <input type="checkbox" class="claim-checkbox rounded border-gray-300 text-primary-600 focus:ring-primary-500" value="@claim.Id">
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center space-x-3">
+                                                <div class="w-10 h-10 bg-gradient-to-br from-gray-500 to-gray-600 rounded-2xl flex items-center justify-center shadow-md">
+                                                    <i class="fas fa-user text-white text-sm"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="font-semibold text-gray-900">@claim.LecturerName</div>
+                                                    @if (claim.AdditionalNotes?.Contains("[FLAGGED:") == true)
+                                                    {
+                                                        <div class="text-xs text-red-600 mt-1 flex items-center space-x-1">
+                                                            <i class="fas fa-flag"></i>
+                                                            <span>Flagged for review</span>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="text-sm text-gray-900">@claim.HoursWorked hours × R@(claim.HourlyRate)/hr</div>
+                                            <div class="text-xs text-gray-500 truncate max-w-xs">
+                                                @(claim.AdditionalNotes?.Length > 50 ? claim.AdditionalNotes.Substring(0, 50) + "..." : claim.AdditionalNotes)
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-lg font-bold text-gray-900">R@(claim.TotalAmount.ToString("F2"))</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            @{
+                                                var statusClass = claim.Status switch
+                                                {
+                                                    "pending" => "bg-gradient-to-br from-yellow-500 to-yellow-600",
+                                                    "approved" => "bg-gradient-to-br from-green-500 to-green-600",
+                                                    "auto-approved" => "bg-gradient-to-br from-blue-500 to-blue-600",
+                                                    "rejected" => "bg-gradient-to-br from-red-500 to-red-600",
+                                                    _ => "bg-gradient-to-br from-gray-500 to-gray-600"
+                                                };
+                                                var statusText = claim.Status switch
+                                                {
+                                                    "auto-approved" => "Auto-Approved",
+                                                    _ => claim.Status
+                                                };
+                                            }
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-white @statusClass">
+                                                @statusText
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            @claim.SubmittedAt.ToString("MMM dd, yyyy")
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <div class="flex space-x-2">
+                                                <button class="view-details text-primary-600 hover:text-primary-800 p-2 rounded-lg hover:bg-primary-50 transition-all duration-300" data-claim-id="@claim.Id">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                @if (claim.Status == "pending")
+                                                {
+                                                    <form method="post" action="@Url.Action("ApproveClaim", "Coordinator")" style="display: inline;">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="claimId" value="@claim.Id" />
+                                                        <button type="submit" class="approve-claim text-green-600 hover:text-green-800 p-2 rounded-lg hover:bg-green-50 transition-all duration-300" onclick="return confirm('Are you sure you want to approve this claim?')">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                    </form>
+                                                    <form method="post" action="@Url.Action("RejectClaim", "Coordinator")" style="display: inline;">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="claimId" value="@claim.Id" />
+                                                        <button type="submit" class="reject-claim text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50 transition-all duration-300" onclick="return confirm('Are you sure you want to reject this claim?')">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </form>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Empty State -->
+                    @if (!Model.Any())
+                    {
+                        <div class="text-center py-12">
+                            <div class="w-16 h-16 bg-gradient-to-br from-gray-300 to-gray-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-inbox text-white text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">No claims found</h3>
+                            <p class="text-gray-500">Try adjusting your filters or check back later.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Wait for DOM to be fully ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('VerifyClaims page loaded');
+
+            // Initialize all functionality
+            initializeClaimSelection();
+            initializeFilters();
+            initializeViewDetails();
+
+            // Add animation delays
+            addAnimationDelays();
+        });
+
+        function initializeClaimSelection() {
+            const selectAllCheckbox = document.getElementById('selectAll');
+            const claimCheckboxes = document.querySelectorAll('.claim-checkbox');
+            const bulkApproveBtn = document.getElementById('bulkApproveBtn');
+            const selectAllBtn = document.getElementById('selectAllBtn');
+            const clearSelectionBtn = document.getElementById('clearSelectionBtn');
+
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', function() {
+                    const isChecked = this.checked;
+                    claimCheckboxes.forEach(checkbox => {
+                        checkbox.checked = isChecked;
+                    });
+                    updateBulkApproveButton();
+                });
+            }
+
+            claimCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    updateSelectAllCheckbox();
+                    updateBulkApproveButton();
+                });
+            });
+
+            if (selectAllBtn) {
+                selectAllBtn.addEventListener('click', function() {
+                    claimCheckboxes.forEach(checkbox => {
+                        checkbox.checked = true;
+                    });
+                    if (selectAllCheckbox) selectAllCheckbox.checked = true;
+                    updateBulkApproveButton();
+                });
+            }
+
+            if (clearSelectionBtn) {
+                clearSelectionBtn.addEventListener('click', function() {
+                    claimCheckboxes.forEach(checkbox => {
+                        checkbox.checked = false;
+                    });
+                    if (selectAllCheckbox) selectAllCheckbox.checked = false;
+                    updateBulkApproveButton();
+                });
+            }
+        }
+
+        function initializeFilters() {
+            const refreshBtn = document.getElementById('refreshBtn');
+            const statusFilter = document.getElementById('statusFilter');
+            const sortBy = document.getElementById('sortBy');
+
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function() {
+                    const button = this;
+                    const originalHTML = button.innerHTML;
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Refreshing...';
+                    button.disabled = true;
+
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                });
+            }
+
+            if (statusFilter) statusFilter.addEventListener('change', applyFilters);
+            if (sortBy) sortBy.addEventListener('change', applyFilters);
+        }
+
+        function initializeViewDetails() {
+            document.querySelectorAll('.view-details').forEach(button => {
+                button.addEventListener('click', function() {
+                    const claimId = this.getAttribute('data-claim-id');
+                    showClaimDetails(claimId);
+                });
+            });
+        }
+
+        function updateSelectAllCheckbox() {
+            const selectAllCheckbox = document.getElementById('selectAll');
+            const claimCheckboxes = document.querySelectorAll('.claim-checkbox');
+            const checkedCount = document.querySelectorAll('.claim-checkbox:checked').length;
+            const totalCount = claimCheckboxes.length;
+
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = checkedCount === totalCount && totalCount > 0;
+                selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < totalCount;
+            }
+        }
+
+        function updateBulkApproveButton() {
+            const bulkApproveBtn = document.getElementById('bulkApproveBtn');
+            const checkedCount = document.querySelectorAll('.claim-checkbox:checked').length;
+
+            if (bulkApproveBtn) {
+                if (checkedCount > 0) {
+                    bulkApproveBtn.disabled = false;
+                    bulkApproveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    bulkApproveBtn.innerHTML = `<i class="fas fa-check-double mr-2"></i>Bulk Approve (${checkedCount})`;
+                } else {
+                    bulkApproveBtn.disabled = true;
+                    bulkApproveBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    bulkApproveBtn.innerHTML = '<i class="fas fa-check-double mr-2"></i>Bulk Approve';
+                }
+            }
+        }
+
+        function applyFilters() {
+            const tableBody = document.querySelector('tbody');
+            if (!tableBody) return;
+
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="px-6 py-8 text-center">
+                        <div class="flex items-center justify-center space-x-3">
+                            <i class="fas fa-spinner fa-spin text-primary-600 text-xl"></i>
+                            <span class="text-gray-600">Applying filters...</span>
+                        </div>
+                    </td>
+                </tr>
+            `;
+
+            setTimeout(() => {
+                location.reload();
+            }, 500);
+        }
+
+        function showClaimDetails(claimId) {
+            showModal('Claim Details', `
+                <div class="text-center py-8">
+                    <i class="fas fa-spinner fa-spin text-primary-600 text-2xl mb-4"></i>
+                    <p class="text-gray-600">Loading claim details...</p>
+                </div>
+            `);
+
+            setTimeout(() => {
+                showModal('Claim Details', `
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700">Lecturer Name</label>
+                                <p class="text-gray-900">Dr. Sarah Johnson</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700">Status</label>
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700">Hours Worked</label>
+                                <p class="text-gray-900">25.5 hours</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700">Hourly Rate</label>
+                                <p class="text-gray-900">R45.00/hr</p>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700">Total Amount</label>
+                            <p class="text-2xl font-bold text-primary-600">R1,147.50</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700">Additional Notes</label>
+                            <p class="text-gray-900 bg-gray-50 p-3 rounded-lg">Lecture preparation and student consultations</p>
+                        </div>
+                    </div>
+                `);
+            }, 1000);
+        }
+
+        function addAnimationDelays() {
+            const slideUpElements = document.querySelectorAll('.slide-up');
+            slideUpElements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.1}s`;
+            });
+        }
+
+        // Global functions
+        window.showModal = function(title, content) {
+            const existingModal = document.getElementById('customModal');
+            if (existingModal) existingModal.remove();
+
+            const modalHTML = `
+                <div id="customModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fade-in">
+                    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full transform scale-95 animate-scale-in">
+                        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                            <h3 class="text-lg font-semibold text-gray-900">${title}</h3>
+                            <button onclick="window.closeModal()" class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
+                                <i class="fas fa-times text-xl"></i>
+                            </button>
+                        </div>
+                        <div class="p-6">
+                            ${content}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        };
+
+        window.closeModal = function() {
+            const modal = document.getElementById('customModal');
+            if (modal) modal.remove();
+        };
+
+        window.showToast = function(message, type = 'info') {
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+
+            toast.className = `fixed top-4 right-4 ${bgColor} text-white px-6 py-3 rounded-xl shadow-lg transform translate-x-full transition-transform duration-300 z-50`;
+            toast.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation-triangle' : 'info'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+
+            document.body.appendChild(toast);
+
+            setTimeout(() => toast.classList.remove('translate-x-full'), 100);
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        };
+    </script>
+}

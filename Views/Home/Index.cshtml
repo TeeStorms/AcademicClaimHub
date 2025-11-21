@@ -1,0 +1,304 @@
+﻿@{
+    ViewData["Title"] = "ClaimFlow Pro - Modern Claim Management";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .slide-up {
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .hover-lift {
+            transition: all 0.3s ease;
+        }
+
+            .hover-lift:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            }
+
+        @@keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased">
+    <!-- Premium Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 overflow-hidden">
+        <!-- Animated Background -->
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="absolute -top-40 -right-32 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
+            <div class="absolute -bottom-40 -left-32 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style="animation-delay: 2s;"></div>
+        </div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-6 text-center">
+            <!-- Logo -->
+            <div class="flex justify-center mb-12 slide-up">
+                <div class="flex items-center space-x-4 bg-white/80 backdrop-blur-sm rounded-2xl px-8 py-4 shadow-xl border border-white/20">
+                    <div class="w-14 h-14 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                        <i class="fas fa-file-invoice-dollar text-white text-2xl"></i>
+                    </div>
+                    <div class="text-left">
+                        <div class="text-3xl font-bold text-gray-900">ClaimFlow</div>
+                        <div class="text-blue-600 font-semibold text-lg">Pro</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Headline -->
+            <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold text-gray-900 mb-8 leading-tight tracking-tight slide-up">
+                Academic
+                <span class="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent block mt-4">
+                    Claims
+                </span>
+            </h1>
+
+            <!-- Subtitle -->
+            <p class="text-2xl md:text-3xl text-gray-600 mb-12 leading-relaxed max-w-4xl mx-auto slide-up" style="animation-delay: 0.2s">
+                Streamline claim management with our <span class="font-semibold text-blue-600">modern platform</span>
+                built for forward-thinking universities
+            </p>
+
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row gap-6 justify-center items-center mb-20 slide-up" style="animation-delay: 0.4s">
+                @if (User.Identity?.IsAuthenticated != true)
+                {
+                    <a href="@Url.Action("Login", "Account")"
+                       class="group relative bg-gradient-to-br from-blue-600 to-purple-600 text-white px-10 py-5 rounded-2xl font-semibold text-xl shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-1 hover:scale-105 flex items-center space-x-4 overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                        <span class="relative">Get Started Free</span>
+                        <i class="fas fa-arrow-right relative group-hover:translate-x-2 transition-transform duration-200"></i>
+                    </a>
+                    <a href="#features"
+                       class="group bg-white/80 backdrop-blur-sm text-gray-900 px-10 py-5 rounded-2xl font-semibold text-xl shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 flex items-center space-x-4">
+                        <i class="fas fa-play-circle text-blue-600 text-xl group-hover:scale-110 transition-transform duration-200"></i>
+                        <span>Watch Demo</span>
+                    </a>
+                }
+                else
+                {
+                    <a href="@Url.Action("Dashboard", "Home")"
+                       class="group bg-gradient-to-br from-blue-600 to-purple-600 text-white px-10 py-5 rounded-2xl font-semibold text-xl shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-1 hover:scale-105 flex items-center space-x-4">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Go to Dashboard</span>
+                    </a>
+                }
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto slide-up" style="animation-delay: 0.6s">
+                <div class="text-center group p-6 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/20 hover-lift">
+                    <div class="text-4xl md:text-5xl font-bold text-gray-900 mb-3 group-hover:scale-110 transition-transform duration-300">95%</div>
+                    <div class="text-lg text-gray-600 font-medium">Faster Processing</div>
+                </div>
+                <div class="text-center group p-6 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/20 hover-lift">
+                    <div class="text-4xl md:text-5xl font-bold text-gray-900 mb-3 group-hover:scale-110 transition-transform duration-300">24/7</div>
+                    <div class="text-lg text-gray-600 font-medium">Availability</div>
+                </div>
+                <div class="text-center group p-6 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/20 hover-lift">
+                    <div class="text-4xl md:text-5xl font-bold text-gray-900 mb-3 group-hover:scale-110 transition-transform duration-300">100%</div>
+                    <div class="text-lg text-gray-600 font-medium">Digital</div>
+                </div>
+                <div class="text-center group p-6 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/20 hover-lift">
+                    <div class="text-4xl md:text-5xl font-bold text-gray-900 mb-3 group-hover:scale-110 transition-transform duration-300">Auto</div>
+                    <div class="text-lg text-gray-600 font-medium">Workflows</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <a href="#features" class="text-gray-400 hover:text-blue-600 transition-colors duration-200">
+                <i class="fas fa-chevron-down text-3xl"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center max-w-3xl mx-auto mb-20 slide-up">
+                <h2 class="text-5xl md:text-6xl font-bold text-gray-900 mb-8">
+                    Built for <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Academic Excellence</span>
+                </h2>
+                <p class="text-2xl text-gray-600 leading-relaxed">
+                    Tailored features that understand the unique needs of university staff and administration
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="group bg-gradient-to-br from-white to-blue-50 rounded-3xl p-8 shadow-2xl border border-blue-100 hover-lift slide-up">
+                    <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-3xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 shadow-lg mx-auto">
+                        <i class="fas fa-chalkboard-teacher text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-gray-900 mb-6 text-center group-hover:text-blue-600 transition-colors duration-200">For Lecturers</h3>
+                    <p class="text-lg text-gray-600 mb-8 leading-relaxed text-center">
+                        Submit claims effortlessly with automatic calculations and real-time tracking. Focus on teaching while we handle the paperwork.
+                    </p>
+                    <ul class="space-y-4 text-base text-gray-600">
+                        <li class="flex items-center space-x-4">
+                            <div class="w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-check text-blue-600"></i>
+                            </div>
+                            <span class="font-medium">Quick claim submission</span>
+                        </li>
+                        <li class="flex items-center space-x-4">
+                            <div class="w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-check text-blue-600"></i>
+                            </div>
+                            <span class="font-medium">Real-time status tracking</span>
+                        </li>
+                        <li class="flex items-center space-x-4">
+                            <div class="w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-check text-blue-600"></i>
+                            </div>
+                            <span class="font-medium">Document management</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="group bg-gradient-to-br from-white to-green-50 rounded-3xl p-8 shadow-2xl border border-green-100 hover-lift slide-up" style="animation-delay: 0.2s">
+                    <div class="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-3xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 shadow-lg mx-auto">
+                        <i class="fas fa-user-tie text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-gray-900 mb-6 text-center group-hover:text-green-600 transition-colors duration-200">For Coordinators</h3>
+                    <p class="text-lg text-gray-600 mb-8 leading-relaxed text-center">
+                        Streamlined approval workflows with automated validation and priority management. Make informed decisions faster.
+                    </p>
+                    <ul class="space-y-4 text-base text-gray-600">
+                        <li class="flex items-center space-x-4">
+                            <div class="w-8 h-8 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-check text-green-600"></i>
+                            </div>
+                            <span class="font-medium">Automated validation</span>
+                        </li>
+                        <li class="flex items-center space-x-4">
+                            <div class="w-8 h-8 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-check text-green-600"></i>
+                            </div>
+                            <span class="font-medium">Bulk processing</span>
+                        </li>
+                        <li class="flex items-center space-x-4">
+                            <div class="w-8 h-8 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-check text-green-600"></i>
+                            </div>
+                            <span class="font-medium">Priority flagging</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="group bg-gradient-to-br from-white to-purple-50 rounded-3xl p-8 shadow-2xl border border-purple-100 hover-lift slide-up" style="animation-delay: 0.4s">
+                    <div class="w-20 h-20 bg-gradient-to-br from-purple-500 to-purple-600 rounded-3xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 shadow-lg mx-auto">
+                        <i class="fas fa-chart-line text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-gray-900 mb-6 text-center group-hover:text-purple-600 transition-colors duration-200">For HR & Management</h3>
+                    <p class="text-lg text-gray-600 mb-8 leading-relaxed text-center">
+                        Comprehensive analytics and reporting with automated payment processing. Gain insights and optimize operations.
+                    </p>
+                    <ul class="space-y-4 text-base text-gray-600">
+                        <li class="flex items-center space-x-4">
+                            <div class="w-8 h-8 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-check text-purple-600"></i>
+                            </div>
+                            <span class="font-medium">Advanced analytics</span>
+                        </li>
+                        <li class="flex items-center space-x-4">
+                            <div class="w-8 h-8 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-check text-purple-600"></i>
+                            </div>
+                            <span class="font-medium">Automated reporting</span>
+                        </li>
+                        <li class="flex items-center space-x-4">
+                            <div class="w-8 h-8 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-check text-purple-600"></i>
+                            </div>
+                            <span class="font-medium">Payment processing</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-24 bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+        <div class="max-w-4xl mx-auto text-center px-6">
+            <div class="slide-up">
+                <h2 class="text-5xl md:text-6xl font-bold mb-8">
+                    Ready to <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Modernize</span> Your Institution?
+                </h2>
+                <p class="text-2xl text-gray-300 mb-12 leading-relaxed max-w-2xl mx-auto">
+                    Join forward-thinking universities using our platform to streamline academic operations and enhance efficiency.
+                </p>
+                @if (User.Identity?.IsAuthenticated != true)
+                {
+                    <div class="flex flex-col sm:flex-row gap-6 justify-center">
+                        <a href="@Url.Action("Login", "Account")"
+                           class="bg-white text-gray-900 px-12 py-5 rounded-2xl font-semibold text-xl shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-1 hover:scale-105">
+                            Start Free Trial
+                        </a>
+                        <a href="#"
+                           class="border-2 border-white text-white px-12 py-5 rounded-2xl font-semibold text-xl hover:bg-white hover:text-gray-900 transition-all duration-500 transform hover:-translate-y-0.5">
+                            Schedule Demo
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="bg-white/10 backdrop-blur-sm rounded-3xl p-12 max-w-2xl mx-auto border border-white/20 hover-lift">
+                        <h3 class="text-3xl font-bold mb-6">Welcome back, @User.Identity?.Name!</h3>
+                        <p class="text-xl text-gray-300 mb-8">Continue managing academic claims with our modern platform designed for efficiency.</p>
+                        <a href="@Url.Action("Dashboard", "Home")"
+                           class="bg-white text-gray-900 px-8 py-4 rounded-2xl font-semibold text-lg hover:shadow-lg transition-all duration-200 inline-flex items-center space-x-3">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Go to Dashboard</span>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Simple animation trigger
+        document.addEventListener('DOMContentLoaded', function() {
+            const elements = document.querySelectorAll('.slide-up');
+            elements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+    </script>
+</body>
+</html>
