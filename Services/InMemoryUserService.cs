@@ -21,6 +21,9 @@ namespace ClaimManagementHub.Services
 
         public bool ValidatePassword(ApplicationUser user, string password)
         {
+            if (user.PasswordHash == null)
+                return false;
+
             var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password);
             return result == PasswordVerificationResult.Success;
         }
@@ -36,7 +39,8 @@ namespace ClaimManagementHub.Services
                 UserName = "lecturer@university.com",
                 Email = "lecturer@university.com",
                 FullName = "Dr. Sarah Johnson",
-                Role = "Lecturer"
+                Role = "Lecturer",
+                Avatar = "/images/avatars/lecturer.png"
             };
             lecturer.PasswordHash = _passwordHasher.HashPassword(lecturer, "Password123!");
             _users.Add(lecturer);
@@ -48,7 +52,8 @@ namespace ClaimManagementHub.Services
                 UserName = "coordinator@university.com",
                 Email = "coordinator@university.com",
                 FullName = "Prof. Michael Chen",
-                Role = "Coordinator"
+                Role = "Coordinator",
+                Avatar = "/images/avatars/coordinator.png"
             };
             coordinator.PasswordHash = _passwordHasher.HashPassword(coordinator, "Password123!");
             _users.Add(coordinator);
@@ -60,7 +65,8 @@ namespace ClaimManagementHub.Services
                 UserName = "hr@university.com",
                 Email = "hr@university.com",
                 FullName = "Emma Wilson",
-                Role = "HR"
+                Role = "HR",
+                Avatar = "/images/avatars/hr.png"
             };
             hr.PasswordHash = _passwordHasher.HashPassword(hr, "Password123!");
             _users.Add(hr);
@@ -72,7 +78,8 @@ namespace ClaimManagementHub.Services
                 UserName = "manager@university.com",
                 Email = "manager@university.com",
                 FullName = "Dr. James Brown",
-                Role = "Manager"
+                Role = "Manager",
+                Avatar = "/images/avatars/manager.png"
             };
             manager.PasswordHash = _passwordHasher.HashPassword(manager, "Password123!");
             _users.Add(manager);

@@ -1,0 +1,261 @@
+﻿<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-50">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ClaimFlow Pro</title>
+
+    <!-- External libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Your custom files -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            900: '#0c4a6e',
+                        }
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.4s ease-out',
+                        'scale-in': 'scaleIn 0.3s ease-out',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Existing animations - keeping these for backward compatibility */
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @@keyframes slideUp {
+            from {
+                transform: translateY(10px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @@keyframes scaleIn {
+            from {
+                transform: scale(0.95);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Additional styles that might be needed before site.css loads */
+        .hover-lift {
+            transition: all 0.3s ease;
+        }
+
+            .hover-lift:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            }
+
+        .slide-up {
+            animation: slideUp 0.8s ease-out;
+        }
+    </style>
+</head>
+
+<body class="h-full font-sans antialiased">
+    <!-- Premium Navigation -->
+    <nav class="bg-white/80 backdrop-blur-xl border-b border-gray-200/60 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl flex items-center justify-center shadow-lg">
+                        <i class="fas fa-file-invoice text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-bold text-gray-900 tracking-tight">ClaimFlow</span>
+                        <span class="text-primary-600 font-semibold">Pro</span>
+                    </div>
+                </div>
+
+                <!-- User Menu -->
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <div class="relative group">
+                        <button class="flex items-center space-x-3 bg-white rounded-2xl px-4 py-2.5 shadow-sm border border-gray-200/60 hover:shadow-md transition-all duration-300">
+                            <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-md">
+                                <span class="text-white text-sm font-medium">@User.Identity?.Name?[0]</span>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-sm font-semibold text-gray-900">@User.Identity?.Name</p>
+                                <p class="text-xs text-gray-500">@User.FindFirst("Role")?.Value</p>
+                            </div>
+                            <i class="fas fa-chevron-down text-gray-400 text-xs transition-transform duration-300 group-hover:rotate-180"></i>
+                        </button>
+
+                        <!-- Premium Dropdown -->
+                        <div class="absolute right-0 mt-2 w-64 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/60 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right scale-95 group-hover:scale-100">
+                            <div class="p-4 border-b border-gray-100">
+                                <p class="text-sm font-semibold text-gray-900">@User.Identity?.Name</p>
+                                <p class="text-xs text-gray-500 mt-1">@User.FindFirst("Role")?.Value</p>
+                            </div>
+
+                            <div class="p-2 space-y-1">
+                                <a href="@Url.Action("Dashboard", "Home")" class="flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition-all duration-200 group">
+                                    <div class="w-8 h-8 bg-gradient-to-br from-primary-50 to-primary-100 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                                        <i class="fas fa-chart-bar text-primary-600 text-sm"></i>
+                                    </div>
+                                    <span>Dashboard</span>
+                                </a>
+
+                                @if (User.HasClaim("Role", "Lecturer"))
+                                {
+                                    <a href="@Url.Action("SubmitClaim", "Lecturer")" class="flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition-all duration-200 group">
+                                        <div class="w-8 h-8 bg-gradient-to-br from-green-50 to-green-100 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                                            <i class="fas fa-plus text-green-600 text-sm"></i>
+                                        </div>
+                                        <span>New Claim</span>
+                                    </a>
+                                }
+
+                                @if (User.HasClaim("Role", "Coordinator") || User.HasClaim("Role", "Manager"))
+                                {
+                                    <a href="@Url.Action("VerifyClaims", "Coordinator")" class="flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition-all duration-200 group">
+                                        <div class="w-8 h-8 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                                            <i class="fas fa-check-circle text-blue-600 text-sm"></i>
+                                        </div>
+                                        <span>Review Claims</span>
+                                    </a>
+                                }
+                            </div>
+
+                            <div class="p-2 border-t border-gray-100">
+                                <form method="post" action="@Url.Action("Logout", "Account")">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="flex items-center space-x-3 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 w-full text-left group">
+                                        <div class="w-8 h-8 bg-gradient-to-br from-red-50 to-red-100 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                                            <i class="fas fa-sign-out-alt text-red-600 text-sm"></i>
+                                        </div>
+                                        <span>Sign Out</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <a href="@Url.Action("Login", "Account")"
+                       class="bg-gradient-to-br from-primary-500 to-primary-600 text-white px-6 py-2.5 rounded-2xl font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
+                        Sign In
+                    </a>
+                }
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1">
+        @RenderBody()
+    </main>
+
+    <!-- Premium Footer -->
+    <footer class="bg-white border-t border-gray-200/60 mt-20">
+        <div class="max-w-7xl mx-auto px-6 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl flex items-center justify-center shadow-md">
+                            <i class="fas fa-file-invoice text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <span class="font-bold text-gray-900 text-lg">ClaimFlow Pro</span>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        Modern claim management for academic institutions. Streamlined, efficient, and secure.
+                    </p>
+                </div>
+
+                <div class="space-y-4">
+                    <h3 class="font-semibold text-gray-900 text-sm uppercase tracking-wider">Platform</h3>
+                    <div class="space-y-2 text-sm text-gray-600">
+                        <a href="#" class="block hover:text-primary-600 transition-colors duration-200">Features</a>
+                        <a href="#" class="block hover:text-primary-600 transition-colors duration-200">Security</a>
+                        <a href="#" class="block hover:text-primary-600 transition-colors duration-200">Pricing</a>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <h3 class="font-semibold text-gray-900 text-sm uppercase tracking-wider">Support</h3>
+                    <div class="space-y-2 text-sm text-gray-600">
+                        <a href="#" class="block hover:text-primary-600 transition-colors duration-200">Documentation</a>
+                        <a href="#" class="block hover:text-primary-600 transition-colors duration-200">Help Center</a>
+                        <a href="#" class="block hover:text-primary-600 transition-colors duration-200">Contact</a>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <h3 class="font-semibold text-gray-900 text-sm uppercase tracking-wider">Legal</h3>
+                    <div class="space-y-2 text-sm text-gray-600">
+                        <a href="#" class="block hover:text-primary-600 transition-colors duration-200">Privacy</a>
+                        <a href="#" class="block hover:text-primary-600 transition-colors duration-200">Terms</a>
+                        <a href="#" class="block hover:text-primary-600 transition-colors duration-200">Compliance</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-200 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-sm text-gray-500">
+                    © 2024 ClaimFlow Pro. Built for modern education.
+                </p>
+                <div class="flex space-x-4 mt-4 md:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-primary-600 transition-colors duration-200">
+                        <i class="fab fa-twitter text-lg"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-primary-600 transition-colors duration-200">
+                        <i class="fab fa-linkedin text-lg"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-primary-600 transition-colors duration-200">
+                        <i class="fab fa-github text-lg"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Add this line to render the Scripts section -->
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

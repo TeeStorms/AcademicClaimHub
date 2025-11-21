@@ -6,5 +6,6 @@ namespace ClaimManagementHub.Models
     {
         public string FullName { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty;
+        public string Avatar { get; set; } = "/images/default-avatar.png"; 
     }
 }

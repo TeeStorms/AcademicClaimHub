@@ -23,11 +23,11 @@ namespace ClaimManagementHub.Services
 
         public Task<Claim> CreateAsync(Claim claim)
         {
-            // Validate claim
+            // Validate claim using our custom validator
             var validationResult = _validator.Validate(claim);
             if (!validationResult.IsValid)
             {
-                var errors = string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage));
+                var errors = string.Join(", ", validationResult.Errors);
                 throw new InvalidOperationException($"Claim validation failed: {errors}");
             }
 
@@ -81,34 +81,56 @@ namespace ClaimManagementHub.Services
         public Task<ClaimSummary> GetSummaryAsync()
         {
             var values = _store.Values.ToList();
+            var approvedClaims = values
+                .Where(c => c.Status == "approved" || c.Status == "auto-approved")
+                .ToList();
+
             var summary = new ClaimSummary
             {
                 TotalClaims = values.Count,
                 PendingClaims = values.Count(c => c.Status == "pending"),
-                ApprovedClaims = values.Count(c => c.Status == "approved" || c.Status == "auto-approved"),
+                ApprovedClaims = approvedClaims.Count,
                 RejectedClaims = values.Count(c => c.Status == "rejected"),
-                TotalAmountApproved = Math.Round(values.Where(c => c.Status == "approved" || c.Status == "auto-approved").Sum(c => c.TotalAmount), 2),
-                AutoApprovedClaims = values.Count(c => c.Status == "auto-approved")
+                TotalAmountApproved = Math.Round(approvedClaims.Sum(c => c.TotalAmount), 2),
+                AutoApprovedClaims = values.Count(c => c.Status == "auto-approved"),
+
+                // ✅ Fix: Prevent NullReferenceException when ReviewedAt is null
+                ProcessedThisMonth = approvedClaims.Count(c =>
+                    c.ReviewedAt.HasValue &&
+                    c.ReviewedAt.Value.Month == DateTime.UtcNow.Month &&
+                    c.ReviewedAt.Value.Year == DateTime.UtcNow.Year)
             };
+
             return Task.FromResult(summary);
         }
+
+
 
         // New method for workflow analysis
         public Task<WorkflowAnalysis> GetWorkflowAnalysisAsync()
         {
             var claims = _store.Values.ToList();
+
+            // Calculate average processing time safely
+            var reviewedClaims = claims.Where(c => c.ReviewedAt.HasValue).ToList();
+            double averageProcessingTime = 0;
+
+            if (reviewedClaims.Count > 0) // Changed from Any() to Count > 0
+            {
+                averageProcessingTime = reviewedClaims
+                    .Average(c => (c.ReviewedAt.Value - c.SubmittedAt).TotalHours);
+            }
+
             var analysis = new WorkflowAnalysis
             {
                 TotalClaims = claims.Count,
                 AutoApprovedCount = claims.Count(c => c.Status == "auto-approved"),
                 FlaggedClaims = claims.Count(c => c.AdditionalNotes?.Contains("[FLAGGED:") == true),
-                AverageProcessingTime = claims
-                    .Where(c => c.ReviewedAt.HasValue)
-                    .Average(c => (c.ReviewedAt.Value - c.SubmittedAt).TotalHours),
+                AverageProcessingTime = averageProcessingTime,
                 CommonFlags = claims
                     .SelectMany(c => _workflowService.GetMatchingRules(c).Select(r => r.Name))
                     .GroupBy(name => name)
-                    .ToDictionary(g => g.Key, g => g.Count())
+                    .ToDictionary(g => g.Key, g => g.Count()) ?? new Dictionary<string, int>()
             };
 
             return Task.FromResult(analysis);

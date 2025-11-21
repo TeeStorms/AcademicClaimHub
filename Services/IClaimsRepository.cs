@@ -12,7 +12,7 @@ namespace ClaimManagementHub.Services
         Task<Claim?> UpdateStatusAsync(int id, string status);
         Task<IEnumerable<Claim>> GetRecentAsync(int count);
         Task<ClaimSummary> GetSummaryAsync();
-        Task<WorkflowAnalysis> GetWorkflowAnalysisAsync(); // NEW
+        Task<WorkflowAnalysis> GetWorkflowAnalysisAsync();
     }
 
     public class ClaimSummary
@@ -21,7 +21,8 @@ namespace ClaimManagementHub.Services
         public int PendingClaims { get; set; }
         public int ApprovedClaims { get; set; }
         public int RejectedClaims { get; set; }
-        public int AutoApprovedClaims { get; set; } // NEW
+        public int AutoApprovedClaims { get; set; }
         public double TotalAmountApproved { get; set; }
+        public int ProcessedThisMonth { get; set; } 
     }
 }
