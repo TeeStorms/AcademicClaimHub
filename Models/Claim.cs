@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace ClaimManagementHub.Models
 {
@@ -15,5 +15,11 @@ namespace ClaimManagementHub.Models
         public string Status { get; set; } = "pending"; // pending, approved, rejected, auto-approved
         public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
         public DateTime? ReviewedAt { get; set; }
+
+        // New properties for enhanced tracking
+        public string? RejectionReason { get; set; }
+        public string? ReviewedBy { get; set; }
+        public string TrackingId { get; set; } = Guid.NewGuid().ToString();
+        public string ProgressStatus { get; set; } = "Submitted"; // Submitted → Under Review → Approved/Rejected
     }
 }

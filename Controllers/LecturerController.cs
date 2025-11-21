@@ -2,6 +2,8 @@
 using ClaimManagementHub.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using ClaimManagementHub.Hubs;
 
 namespace ClaimManagementHub.Controllers
 {
@@ -12,16 +14,22 @@ namespace ClaimManagementHub.Controllers
         private readonly IWebHostEnvironment _env;
         private readonly ILogger<LecturerController> _logger;
         private readonly ApprovalWorkflowService _workflowService;
+        private readonly FileUploadService _fileUploadService;
+        private readonly IHubContext<ClaimHub> _hubContext;
 
-        // Static arrays for file validation
-        private static readonly string[] AllowedFileExtensions = { ".pdf", ".docx", ".xlsx", ".jpg", ".jpeg", ".png" };
-
-        public LecturerController(IClaimsRepository repo, IWebHostEnvironment env, ILogger<LecturerController> logger)
+        public LecturerController(
+            IClaimsRepository repo,
+            IWebHostEnvironment env,
+            ILogger<LecturerController> logger,
+            FileUploadService fileUploadService,
+            IHubContext<ClaimHub> hubContext)
         {
             _repo = repo;
             _env = env;
             _logger = logger;
             _workflowService = new ApprovalWorkflowService();
+            _fileUploadService = fileUploadService;
+            _hubContext = hubContext;
         }
 
         [HttpGet]
@@ -35,66 +43,89 @@ namespace ClaimManagementHub.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SubmitClaim(Claim claim, IFormFile upload)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubmitClaim(Claim claim, IFormFile? supportingDocument)
         {
             try
             {
                 // Set lecturer name from authenticated user
                 claim.LecturerName = User.Identity?.Name ?? string.Empty;
+                claim.TrackingId = Guid.NewGuid().ToString();
+                claim.ProgressStatus = "Submitted";
 
-                // Basic validation
+                // Enhanced validation
+                var validationErrors = new List<string>();
+
                 if (string.IsNullOrWhiteSpace(claim.LecturerName))
-                {
-                    ModelState.AddModelError("LecturerName", "Lecturer name is required");
-                }
+                    validationErrors.Add("Lecturer name is required");
+
                 if (claim.HoursWorked <= 0)
-                {
-                    ModelState.AddModelError("HoursWorked", "Hours worked must be greater than 0");
-                }
+                    validationErrors.Add("Hours worked must be greater than 0");
+                else if (claim.HoursWorked > 100)
+                    validationErrors.Add("Hours worked cannot exceed 100 hours");
+
                 if (claim.HourlyRate <= 0)
+                    validationErrors.Add("Hourly rate must be greater than 0");
+                else if (claim.HourlyRate > 500)
+                    validationErrors.Add("Hourly rate cannot exceed R500 per hour");
+
+                if (validationErrors.Count > 0)
                 {
-                    ModelState.AddModelError("HourlyRate", "Hourly rate must be greater than 0");
+                    return Json(new { success = false, errors = validationErrors });
                 }
 
-                if (!ModelState.IsValid)
+                // Auto-calculate total amount
+                claim.TotalAmount = Math.Round(claim.HoursWorked * claim.HourlyRate, 2);
+
+                // Handle file upload with enhanced service
+                if (supportingDocument != null && supportingDocument.Length > 0)
                 {
-                    return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
-                }
-
-                // Handle file upload
-                if (upload != null && upload.Length > 0)
-                {
-                    var ext = Path.GetExtension(upload.FileName).ToLowerInvariant();
-                    if (!AllowedFileExtensions.Contains(ext))
+                    var uploadResult = await _fileUploadService.UploadFileAsync(supportingDocument, "supporting-docs");
+                    if (!uploadResult.Success)
                     {
-                        return Json(new { success = false, errors = new[] { "Invalid file type. Allowed: .pdf, .docx, .xlsx, .jpg, .jpeg, .png" } });
-                    }
-                    if (upload.Length > 5 * 1024 * 1024)
-                    {
-                        return Json(new { success = false, errors = new[] { "File size must be less than 5MB" } });
+                        return Json(new { success = false, errors = new[] { uploadResult.Error } });
                     }
 
-                    var uploadsDir = Path.Combine(_env.WebRootPath, "uploads");
-                    if (!Directory.Exists(uploadsDir))
-                        Directory.CreateDirectory(uploadsDir);
-
-                    var fileName = $"{Guid.NewGuid()}{ext}";
-                    var filePath = Path.Combine(uploadsDir, fileName);
-                    using (var stream = System.IO.File.Create(filePath))
-                    {
-                        await upload.CopyToAsync(stream);
-                    }
-
-                    claim.FileName = upload.FileName;
-                    claim.FilePath = $"/uploads/{fileName}";
+                    claim.FileName = uploadResult.FileName;
+                    claim.FilePath = uploadResult.FilePath;
                 }
 
                 // Process through workflow
                 var workflowResult = _workflowService.ProcessClaim(claim);
 
+                // Update progress status based on workflow result
+                if (workflowResult.IsAutoApproved)
+                {
+                    claim.ProgressStatus = "Auto-Approved";
+                    claim.Status = "auto-approved";
+                    claim.ReviewedAt = DateTime.UtcNow;
+                    claim.ReviewedBy = "System";
+                }
+                else
+                {
+                    claim.ProgressStatus = "Under Review";
+                }
+
                 var created = await _repo.CreateAsync(claim);
 
-                _logger.LogInformation("Claim submitted by {Lecturer} for R{Amount}", claim.LecturerName, claim.TotalAmount);
+                // Notify coordinators via SignalR
+                if (_hubContext != null)
+                {
+                    await _hubContext.Clients.Group("Coordinators")
+                        .SendAsync("NewClaimSubmitted", new
+                        {
+                            ClaimId = created.Id,
+                            LecturerName = created.LecturerName,
+                            Amount = created.TotalAmount,
+                            SubmittedAt = created.SubmittedAt,
+                            Status = created.Status,
+                            IsAutoApproved = workflowResult.IsAutoApproved,
+                            Flags = workflowResult.Flags
+                        });
+                }
+
+                _logger.LogInformation("Claim {ClaimId} submitted by {Lecturer} for R{Amount}",
+                    created.Id, claim.LecturerName, claim.TotalAmount);
 
                 return Json(new
                 {
@@ -102,13 +133,19 @@ namespace ClaimManagementHub.Controllers
                     message = $"Claim submitted successfully! Total amount: R{created.TotalAmount:F2}",
                     isAutoApproved = workflowResult.IsAutoApproved,
                     flags = workflowResult.Flags,
-                    claimId = created.Id
+                    claimId = created.Id,
+                    trackingId = created.TrackingId,
+                    progressStatus = created.ProgressStatus
                 });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error submitting claim for lecturer {Lecturer}", User.Identity?.Name);
-                return Json(new { success = false, errors = new[] { "An error occurred while submitting the claim. Please try again." } });
+                return Json(new
+                {
+                    success = false,
+                    errors = new[] { "An error occurred while submitting the claim. Please try again." }
+                });
             }
         }
 
@@ -149,10 +186,14 @@ namespace ClaimManagementHub.Controllers
                     data = new
                     {
                         claim.Status,
+                        claim.ProgressStatus,
                         claim.SubmittedAt,
                         claim.ReviewedAt,
                         claim.TotalAmount,
-                        claim.AdditionalNotes
+                        claim.AdditionalNotes,
+                        claim.TrackingId,
+                        claim.ReviewedBy,
+                        claim.RejectionReason
                     }
                 });
             }
@@ -160,6 +201,31 @@ namespace ClaimManagementHub.Controllers
             {
                 _logger.LogError(ex, "Error fetching claim status for claim {ClaimId}", id);
                 return Json(new { success = false, message = "Error loading claim status" });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> TrackClaim(string trackingId)
+        {
+            try
+            {
+                var allClaims = await _repo.GetAllAsync();
+                var claim = allClaims.FirstOrDefault(c => c.TrackingId == trackingId &&
+                                                         c.LecturerName == User.Identity?.Name);
+
+                if (claim == null)
+                {
+                    TempData["ErrorMessage"] = "Claim not found or you don't have permission to view it.";
+                    return RedirectToAction("MyClaims");
+                }
+
+                return View(claim);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error tracking claim {TrackingId}", trackingId);
+                TempData["ErrorMessage"] = "Error loading claim details.";
+                return RedirectToAction("MyClaims");
             }
         }
     }
